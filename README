@@ -1,0 +1,9 @@
+Le programme doit être:
+
+-> utilisable en local avec une entrée standard, sortie standard
+-> Utilisable en remote avec un utilisateur distant par telnet
+
+-> Basculer de local vers distant et inversement.
+
+-> enregistrer, rejouer des fichiers de logs.
+
