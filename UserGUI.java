@@ -8,14 +8,14 @@ public class UserGUI{
 
     protected BufferedReader inputUser = null;
     protected PrintStream outputUser = null;
-    protected PrintStream outputLog;
+    protected PrintWriter outputLog;
     protected ServerSocket calculatrice;
-    protected boolean logMod;
+    protected boolean logMod = false;
     protected int quit;
 
     public UserGUI(){
         this.outputLog = outputLog;
-        this.logMod = logMod;
+        this.logMod = false;
         this.quit = 0;
         this.execute();
     }
@@ -27,13 +27,29 @@ public class UserGUI{
         int taille= 0;
 
         System.out.println("Bonjour, bienvenue dans le programme calculatrice RPL\n");
+        if(args[0] != null){
+            System.out.println("Souhaitez-vous rejouez un fichier de log ? ");
+            try{
+                ligne = inputUser.readLine();
+                if(ligne.equals("oui"){
+                    
+                }
+                else if(ligne.equals("non")){
+                    System.out.println("Demarrage du programme principal");
+                }
+            }catch(IOException oe){
+                System.out.println("Choix invalide, la reponse est non.");
+                System.out.println("Demarrage du programme principal");
+            }
+        }
         System.out.print("Tout d'abord, choisissez la taille de la pile: ");
         try{
             ligne = inputUser.readLine();
             taille = Integer.parseInt(ligne);
             System.out.println("Vous avez choisis une taille de "+ taille +" pour votre pile.");
-        }catch(IOException ie){
-            System.out.println("Erreur lors de l'entrée utilisateur.");
+        }catch(Exception ie){
+            System.out.println("Erreur lors de l'entrée utilisateur, choix de la taille par défault (10)");
+            taille = 10;
         }
         PileRPL pile = new PileRPL(taille);
         System.out.println("Démarrage de la calculatrice...");
@@ -51,10 +67,18 @@ public class UserGUI{
 
             //Debut des choix utilisateurs
             choix_utilisateur(ligne, pile);
+            try{
+                calculatrice.close();
+            }catch(Exception oie){
+
+            }
             outputUser.println(pile);
 
         }
-
+        try{
+            outputLog.close();
+        }catch(Exception oe){
+        }
         System.exit(0);
     }
 
@@ -64,13 +88,19 @@ public class UserGUI{
             if(entree[i].equals("distant")){
                 try{
                     //Fonction qui permet d'ouvrir un serveur et attends des connexions.
+                    System.out.println("Ouverture d'un socket sur le port 12345, pour vous connecter utilisez la commande suivante nc <IP_MACHINE> 12345");
                     this.logMod = false;
                     this.calculatrice = new ServerSocket(12345);
                     Socket socket = calculatrice.accept();
                     this.inputUser = new BufferedReader ( new InputStreamReader(socket.getInputStream() ) );
                     this.outputUser = new PrintStream( socket.getOutputStream() );
-
                 }catch(Exception oe){
+                    try{
+                        calculatrice.close();
+                    }
+                    catch(IOException ie){
+                        System.out.println("Unable to close socket");
+                    }
                     System.out.println("Erreur lors de l'ouvertur d'un socket") ;
                 }
 
@@ -80,6 +110,7 @@ public class UserGUI{
                 try{
                     //Fonction qui gère le local
                     this.logMod = true;
+                    calculatrice.close();
                     this.inputUser = new BufferedReader( new InputStreamReader( System.in ));
                     this.outputUser = new PrintStream (System.out);
                 }catch(Exception oe){
@@ -87,16 +118,43 @@ public class UserGUI{
                 }
             }
 
-            else if(entree[i].equals("log"));
-            else
-                Parse(entree, pile, i);
+            else if(entree[i].equals("log")){
+                try{
+                    if(entree[i+1].equals("on")){
+                        try{ 
+                            this.calculatrice.close();
+                        }catch(Exception oe){
+                        }
+                        this.logMod = true;
+                        this.outputLog = new PrintWriter( new BufferedWriter( new FileWriter( "fichierLog.txt" )));
+                    }
+                    else if(entree[i+1].equals("off")){
+                        this.logMod = false;
+                        this.outputLog = null;
+                    }
+                }catch(Exception ie){
+                    System.out.println("Commande log in complete.");
+                }
 
+            }
+            else if(entree[i].equals("push") || entree[i].equals("add") || entree[i].equals("pop") || entree[i].equals("mult") || entree[i].equals("sous") || entree[i].equals("div") || entree[i].equals("quit") ) {
+                if(this.logMod==true){
+                    outputLog.println(st);
+                }
+                Parse(entree, pile, i);
+            }
+            else
+                System.out.println("Commande non implemente");
         }
 
     }
 
     public void Parse(String[] total, PileRPL pile, int x){
         //Boucle while pour parser l'entree utilisateur et dire les commandes.
+        if(this.logMod == true){
+
+        }
+
         ObjEmp obj = null;
         switch(total[x]){
             case "push":
@@ -123,7 +181,7 @@ public class UserGUI{
                 pile.operation('/');
                 break;
 
-            case "multi":
+            case "mult":
                 pile.operation('*');
                 break;
 
@@ -145,3 +203,8 @@ public class UserGUI{
         }
     }
 }
+
+public void rejoue(){
+
+
+     }

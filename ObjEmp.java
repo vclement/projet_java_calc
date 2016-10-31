@@ -23,7 +23,7 @@ public class ObjEmp{
     }
 
     public int mult(ObjEmp oe){
-        return val = val * oe.getVal();
+        return val *= oe.getVal();
     }
     
     public int div(ObjEmp oe){
