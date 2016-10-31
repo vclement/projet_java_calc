@@ -1,3 +1,3 @@
 #!/bin/bash
 
-rm *.class && javac UserGUI.java
+rm *.class && javac Main.java
