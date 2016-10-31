@@ -5,69 +5,133 @@ import java.util.StringTokenizer;
 
 public class UserGUI{
 
-    protected BufferedReader inputUser;
-    protected PrintStream outputUser;
+    protected BufferedReader inputUser = null;
+    protected PrintStream outputUser = null;
     protected PrintStream outputLog;
     protected boolean logMod;
+    protected int quit;
 
     public UserGUI(){
+        this.outputLog = outputLog;
+        this.logMod = logMod;
+        this.quit = 0;
         this.execute();
     }
 
-//    public static void main(String[] args){
-//        new UserGUI();
-//        int taille=10;
-//        String ligne;
-//        boolean sucess = false;
-//        StringTokenizer st;
-//        String entree;
-//        System.out.println("Veuillez entrer la taille de la pile [10 par defaut]: ");
-//        BufferedReader inputUser = new BufferedReader( new InputStreamReader( System.in ));
-//        try{  
-//            ligne = inputUser.readLine();
-//            taille = Integer.parseInt(ligne);
-//        }catch(Exception oe){
-//            System.out.println("Utilisation de la taille par défault");
-//            taille=10;
-//        }
-//        PileRPL pile = new PileRPL(taille);
-//
-//        System.out.println(pile);
-//        int i=0;
-//        while(i==0){
-//            try{
-//                ligne = inputUser.readLine();
-//                Parse(ligne);
-//            }
-//            catch(IOException ie){
-//                System.out.println("error during parsing");
-//            }
-//            if(taille==2){
-//                i=500;
-//            }
-//            System.out.println(pile);
-//
-//        }
-//    }
-
-
     public void execute(){
         inputUser = new BufferedReader( new InputStreamReader( System.in ));
-        String ligne;
-        System.out.println("Bonjour, bienvenue dans le programme calculatrice RPL");
+        outputUser = new PrintStream (System.out);
+        String ligne = "";
+        int taille= 0;
+
+        System.out.println("Bonjour, bienvenue dans le programme calculatrice RPL\n");
+        System.out.print("Tout d'abord, choisissez la taille de la pile: ");
         try{
             ligne = inputUser.readLine();
+            taille = Integer.parseInt(ligne);
+            System.out.println("Vous avez choisis une taille de "+ taille +" pour votre pile.");
         }catch(IOException ie){
             System.out.println("Erreur lors de l'entrée utilisateur.");
         }
+        PileRPL pile = new PileRPL(taille);
+        System.out.println("Démarrage de la calculatrice...");
+
+        while(this.quit == 0){
+            outputUser.println("\nCommandes possible: push <valeur> ; add ; div ; mult ; sous ; pop ; quit");
+            outputUser.println("Pour basculer sur un usage distant, utilisez la commande \"distant\", pour revenir sur un usage local, utilisez la commande \"local\".\n");
+            outputUser.println("Pour utiliser les logs en local, il faut utiliser la commande \"log\" ");
+            outputUser.print("Votre commande: ");
+            try{
+                ligne = inputUser.readLine();
+            }
+            catch(IOException ie){
+                System.out.println("Erreur dans la saisie");
+            }
+
+            choix_utilisateur(ligne, pile);
+            System.out.println(pile);
+
+        }
+        System.exit(0);
     }
 
-    public void Parse(String st){
+    public void choix_utilisateur(String st, PileRPL pile){
+        String[] entree = st.split("\\s");
+        for(int i=0; i<entree.length;i++){
+            if(entree[i].equals("distant")){
+                try{
+                    //Fonction qui permet d'ouvrir un serveur et attends des connexions.
+                    this.logMod = false;
+                }catch(Exception oe){
+                
+                }
+            
+            }
+
+            else if(entree[i].equals("local")){
+                try{
+                    //Fonction qui gère le local
+                    this.logMod = true;
+                }catch(Exception oe){
+                
+                }
+            }
+
+            else if(entree[i].equals("log"));
+            else
+               Parse(entree, pile, i);
+
+        }
+
+    }
+
+    public void Parse(String[] total, PileRPL pile, int x){
         //Boucle while pour parser l'entree utilisateur et dire les commandes.
-        String[] total = st.split("\\s");
-        for(int x=0;x<total.length;x++){
-            System.out.println(total[x]);
-        }    
-    
+        ObjEmp obj = null;
+        switch(total[x]){
+            case "push":
+                try{
+                    obj = new ObjEmp(Integer.parseInt(total[x+1]));
+                }
+                catch(NumberFormatException oe){
+                    System.out.println("Erreur lors de la saisie de l'entier");
+                }
+                try{
+                    pile.push(obj);
+                }catch(Exception ie){
+                    System.out.println("Erreur lors du push, pile pleine.");
+                }
+                x++;
+                obj = null;
+                break;
+
+            case "add":
+                pile.operation('+');
+                break;
+
+            case "div":
+                pile.operation('/');
+                break;
+
+            case "multi":
+                pile.operation('*');
+                break;
+
+            case "sous":
+                pile.operation('-');
+                break;
+
+            case "pop":
+                try{
+                    pile.pop();
+                }catch(Exception ie){
+                    System.out.println("Erreur lors du pop, pile vide.");
+                }
+                break;
+
+            case "quit":
+                this.quit=1;
+                break;
+        }
     }
 }
