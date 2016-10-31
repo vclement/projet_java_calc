@@ -2,12 +2,14 @@
 //
 import java.io.*;
 import java.util.StringTokenizer;
+import java.net.*;
 
 public class UserGUI{
 
     protected BufferedReader inputUser = null;
     protected PrintStream outputUser = null;
     protected PrintStream outputLog;
+    protected ServerSocket calculatrice;
     protected boolean logMod;
     protected int quit;
 
@@ -39,7 +41,6 @@ public class UserGUI{
         while(this.quit == 0){
             outputUser.println("\nCommandes possible: push <valeur> ; add ; div ; mult ; sous ; pop ; quit");
             outputUser.println("Pour basculer sur un usage distant, utilisez la commande \"distant\", pour revenir sur un usage local, utilisez la commande \"local\".\n");
-            outputUser.println("Pour utiliser les logs en local, il faut utiliser la commande \"log\" ");
             outputUser.print("Votre commande: ");
             try{
                 ligne = inputUser.readLine();
@@ -47,12 +48,13 @@ public class UserGUI{
             catch(IOException ie){
                 System.out.println("Erreur dans la saisie");
             }
-            
+
             //Debut des choix utilisateurs
             choix_utilisateur(ligne, pile);
-            System.out.println(pile);
+            outputUser.println(pile);
 
         }
+
         System.exit(0);
     }
 
@@ -63,24 +65,31 @@ public class UserGUI{
                 try{
                     //Fonction qui permet d'ouvrir un serveur et attends des connexions.
                     this.logMod = false;
+                    this.calculatrice = new ServerSocket(12345);
+                    Socket socket = calculatrice.accept();
+                    this.inputUser = new BufferedReader ( new InputStreamReader(socket.getInputStream() ) );
+                    this.outputUser = new PrintStream( socket.getOutputStream() );
+
                 }catch(Exception oe){
-                
+                    System.out.println("Erreur lors de l'ouvertur d'un socket") ;
                 }
-            
+
             }
 
             else if(entree[i].equals("local")){
                 try{
                     //Fonction qui gère le local
                     this.logMod = true;
+                    this.inputUser = new BufferedReader( new InputStreamReader( System.in ));
+                    this.outputUser = new PrintStream (System.out);
                 }catch(Exception oe){
-                
+                    System.out.println("Erreur lors de l'initialisation des variables.");
                 }
             }
 
             else if(entree[i].equals("log"));
             else
-               Parse(entree, pile, i);
+                Parse(entree, pile, i);
 
         }
 
