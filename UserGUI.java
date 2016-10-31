@@ -47,7 +47,8 @@ public class UserGUI{
             catch(IOException ie){
                 System.out.println("Erreur dans la saisie");
             }
-
+            
+            //Debut des choix utilisateurs
             choix_utilisateur(ligne, pile);
             System.out.println(pile);
 
