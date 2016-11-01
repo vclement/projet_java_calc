@@ -17,22 +17,22 @@ public class UserGUI{
         this.outputLog = outputLog;
         this.logMod = false;
         this.quit = 0;
-        this.execute();
     }
 
-    public void execute(){
+    public void execute(String[] args){
         inputUser = new BufferedReader( new InputStreamReader( System.in ));
         outputUser = new PrintStream (System.out);
         String ligne = "";
         int taille= 0;
-
+        
         System.out.println("Bonjour, bienvenue dans le programme calculatrice RPL\n");
         if(args[0] != null){
             System.out.println("Souhaitez-vous rejouez un fichier de log ? ");
             try{
                 ligne = inputUser.readLine();
-                if(ligne.equals("oui"){
-                    
+                if(ligne.equals("oui")){
+                     PileRPL pile = new PileRPL(10);
+                     rejoue(args[0], pile);
                 }
                 else if(ligne.equals("non")){
                     System.out.println("Demarrage du programme principal");
@@ -42,15 +42,16 @@ public class UserGUI{
                 System.out.println("Demarrage du programme principal");
             }
         }
-        System.out.print("Tout d'abord, choisissez la taille de la pile: ");
-        try{
-            ligne = inputUser.readLine();
-            taille = Integer.parseInt(ligne);
-            System.out.println("Vous avez choisis une taille de "+ taille +" pour votre pile.");
-        }catch(Exception ie){
-            System.out.println("Erreur lors de l'entrée utilisateur, choix de la taille par défault (10)");
-            taille = 10;
-        }
+       // System.out.print("Tout d'abord, choisissez la taille de la pile: ");
+       // try{
+       //     ligne = inputUser.readLine();
+       //     taille = Integer.parseInt(ligne);
+       //     System.out.println("Vous avez choisis une taille de "+ taille +" pour votre pile.");
+       // }catch(Exception ie){
+       //     System.out.println("Erreur lors de l'entrée utilisateur, choix de la taille par défault (10)");
+       //     taille = 10;
+       // }
+        taille=10;
         PileRPL pile = new PileRPL(taille);
         System.out.println("Démarrage de la calculatrice...");
 
@@ -202,9 +203,21 @@ public class UserGUI{
                 break;
         }
     }
+
+
+
+    public void rejoue(String fichier, PileRPL pile) throws IOException{
+        String ligne;
+        BufferedReader lecteur = null;
+        try{
+            lecteur = new BufferedReader( new FileReader( fichier ) );
+        }catch(FileNotFoundException exc){
+            System.out.println("Fichier introuvable");
+        }
+
+        while( (ligne=lecteur.readLine()) != null ){
+            choix_utilisateur(ligne, pile);
+            System.out.println(pile);
+        }
+    }
 }
-
-public void rejoue(){
-
-
-     }

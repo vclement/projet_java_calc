@@ -7,8 +7,8 @@ public class Main{
 //
     public static void main(String[] args){
         UserGUI objet = new UserGUI();
-
-        objet.execute();
+        String[] limit = args;
+        objet.execute(limit);
     }
 
 }
