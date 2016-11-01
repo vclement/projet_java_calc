@@ -1,4 +1,9 @@
-push 7
-push 8
+push 78
+push 98
+push 56
 add
+mult
+push 4
+push 36
+div
 quit
